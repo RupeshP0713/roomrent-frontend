@@ -4,12 +4,13 @@ import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { dbService } from '../services/dbService';
 import { useLanguage } from '../contexts/LanguageContext';
-import type { AdminStats, User, Transaction } from '../types';
+import type { AdminStats, User, Transaction, Malik, Bhadot, RentRequestWithDetails } from '../types';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<{ maliks: User[]; bhadots: User[] }>({ maliks: [], bhadots: [] });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -25,6 +26,12 @@ export default function AdminDashboard() {
   const [editingBhadot, setEditingBhadot] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<any>({});
   const [saving, setSaving] = useState(false);
+
+  // View details modal state
+  const [viewRole, setViewRole] = useState<'Malik' | 'Bhadot' | null>(null);
+  const [viewUser, setViewUser] = useState<Malik | Bhadot | null>(null);
+  const [viewRequests, setViewRequests] = useState<RentRequestWithDetails[]>([]);
+  const [viewLoading, setViewLoading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -109,6 +116,52 @@ export default function AdminDashboard() {
     setEditingMalik(null);
     setEditingBhadot(null);
     setEditFormData({});
+  };
+
+  const handleViewMalik = async (id: string) => {
+    setViewRole('Malik');
+    setViewLoading(true);
+    try {
+      const [malik, requests] = await Promise.all([
+        dbService.getMalik(id),
+        dbService.getMalikRequests(id),
+      ]);
+      setViewUser(malik);
+      setViewRequests(requests);
+    } catch (error) {
+      alert('Failed to load Malik details');
+      setViewRole(null);
+      setViewUser(null);
+      setViewRequests([]);
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const handleViewBhadot = async (id: string) => {
+    setViewRole('Bhadot');
+    setViewLoading(true);
+    try {
+      const [bhadot, requests] = await Promise.all([
+        dbService.getBhadot(id),
+        dbService.getBhadotRequests(id),
+      ]);
+      setViewUser(bhadot);
+      setViewRequests(requests);
+    } catch (error) {
+      alert('Failed to load Bhadot details');
+      setViewRole(null);
+      setViewUser(null);
+      setViewRequests([]);
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const closeViewModal = () => {
+    setViewRole(null);
+    setViewUser(null);
+    setViewRequests([]);
   };
 
   // Pagination calculations
@@ -288,6 +341,12 @@ export default function AdminDashboard() {
                                 <td className="py-3 px-4">
                                   <div className="flex gap-2">
                                     <button
+                                      onClick={() => handleViewMalik(user.id)}
+                                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                    >
+                                      View
+                                    </button>
+                                    <button
                                       onClick={() => handleEditMalik(user)}
                                       className="text-green-600 hover:text-green-800 font-medium text-sm"
                                     >
@@ -434,6 +493,12 @@ export default function AdminDashboard() {
                                 <td className="py-3 px-4">
                                   <div className="flex gap-2">
                                     <button
+                                      onClick={() => handleViewBhadot(user.id)}
+                                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                    >
+                                      View
+                                    </button>
+                                    <button
                                       onClick={() => handleEditBhadot(user)}
                                       className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                                     >
@@ -537,6 +602,147 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
+
+      {viewRole && viewUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 relative">
+            <button
+              type="button"
+              onClick={closeViewModal}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {viewRole === 'Malik' ? 'Malik Details' : 'Bhadot Details'}
+            </h2>
+
+            {viewLoading ? (
+              <div className="py-10 flex items-center justify-center">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {viewRole === 'Malik' ? (
+                    <>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">ID</div>
+                        <div className="font-mono text-sm">{(viewUser as Malik).id}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Name</div>
+                        <div className="font-medium">{(viewUser as Malik).name}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">WhatsApp</div>
+                        <div>{(viewUser as Malik).whatsapp}</div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Address</div>
+                        <div>{(viewUser as Malik).address}</div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">ID</div>
+                        <div className="font-mono text-sm">{(viewUser as Bhadot).id}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Name</div>
+                        <div className="font-medium">{(viewUser as Bhadot).name}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Mobile</div>
+                        <div>{(viewUser as Bhadot).mobile}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Status</div>
+                        <div>{(viewUser as Bhadot).status}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Cast</div>
+                        <div>{(viewUser as Bhadot).cast || '-'}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Family Members</div>
+                        <div>{(viewUser as Bhadot).totalFamilyMembers ?? '-'}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Area</div>
+                        <div>{(viewUser as Bhadot).area || '-'}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase">Active</div>
+                        <div>{(viewUser as Bhadot).isActive === false ? 'Inactive' : 'Active'}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Requests</h3>
+                  {viewRequests.length === 0 ? (
+                    <p className="text-sm text-gray-500">No requests found.</p>
+                  ) : (
+                    <div className="max-h-64 overflow-y-auto border border-gray-100 rounded-2xl">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="text-left py-2 px-3 font-semibold text-gray-700">ID</th>
+                            {viewRole === 'Malik' ? (
+                              <>
+                                <th className="text-left py-2 px-3 font-semibold text-gray-700">Bhadot</th>
+                                <th className="text-left py-2 px-3 font-semibold text-gray-700">Mobile</th>
+                              </>
+                            ) : (
+                              <th className="text-left py-2 px-3 font-semibold text-gray-700">Malik</th>
+                            )}
+                            <th className="text-left py-2 px-3 font-semibold text-gray-700">Status</th>
+                            <th className="text-left py-2 px-3 font-semibold text-gray-700">Time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {viewRequests.map((req) => (
+                            <tr key={req.id} className="border-t border-gray-100">
+                              <td className="py-2 px-3 font-mono text-xs">{req.id}</td>
+                              {viewRole === 'Malik' ? (
+                                <>
+                                  <td className="py-2 px-3">{req.bhadotName}</td>
+                                  <td className="py-2 px-3 text-gray-600">{req.bhadotMobile}</td>
+                                </>
+                              ) : (
+                                <td className="py-2 px-3">{req.malikName}</td>
+                              )}
+                              <td className="py-2 px-3">
+                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                  req.status === 'Accepted'
+                                    ? 'bg-green-100 text-green-800'
+                                    : req.status === 'Rejected'
+                                    ? 'bg-red-100 text-red-800'
+                                    : req.status === 'Expired'
+                                    ? 'bg-gray-100 text-gray-700'
+                                    : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {req.status}
+                                </span>
+                              </td>
+                              <td className="py-2 px-3 text-gray-500">
+                                {new Date(req.timestamp).toLocaleString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
