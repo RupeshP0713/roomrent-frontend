@@ -218,32 +218,16 @@ export default function BhadotDashboard() {
                 disabled={togglingActive}
                 className="flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <div className="relative w-20 h-9 rounded-full bg-gray-300 flex items-center justify-between px-1">
+                <div className="relative w-20 h-9 rounded-full bg-gray-300 flex items-center px-1">
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    className={`absolute top-1 left-1 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-md transition-transform duration-200 ${
                       bhadot.isActive === false
-                        ? 'bg-red-500 text-white shadow-md'
-                        : 'bg-gray-500 text-gray-200'
+                        ? 'bg-red-500 translate-x-0'
+                        : 'bg-green-500 translate-x-10'
                     }`}
                   >
-                    OFF
+                    {bhadot.isActive === false ? 'OFF' : 'ON'}
                   </div>
-                  <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                      bhadot.isActive === false
-                        ? 'bg-gray-500 text-gray-200'
-                        : 'bg-green-500 text-white shadow-md'
-                    }`}
-                  >
-                    ON
-                  </div>
-                  <div
-                    className={`absolute top-1 w-7 h-7 rounded-full transition-transform duration-200 ${
-                      bhadot.isActive === false
-                        ? 'translate-x-0 bg-red-500 shadow-lg'
-                        : 'translate-x-10 bg-green-500 shadow-lg'
-                    }`}
-                  />
                 </div>
                 <span className="text-sm font-medium text-gray-800">
                   {bhadot.isActive === false ? t('bhadotStatusInactive') : t('bhadotStatusActive')}
