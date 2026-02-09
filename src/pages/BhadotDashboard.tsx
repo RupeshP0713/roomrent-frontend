@@ -323,18 +323,27 @@ export default function BhadotDashboard() {
               </div>
               <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-4 border-2 border-white/30">
                 <div className="text-center">
-                  <div className="text-3xl font-bold mb-1">
-                    {countdown.days > 0 ? (
-                      <span>{countdown.days}d {countdown.hours}h {countdown.minutes}m {countdown.seconds}s</span>
-                    ) : countdown.hours > 0 ? (
-                      <span>{countdown.hours}h {countdown.minutes}m {countdown.seconds}s</span>
-                    ) : countdown.minutes > 0 ? (
-                      <span>{countdown.minutes}m {countdown.seconds}s</span>
-                    ) : (
-                      <span className="text-red-200">{countdown.seconds}s</span>
+                  <div className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
+                    {countdown.days > 0 && (
+                      <span className="bg-white/30 rounded-lg px-3 py-1">
+                        <span className="text-2xl">{String(countdown.days).padStart(2, '0')}</span>
+                        <span className="text-lg ml-1">d</span>
+                      </span>
                     )}
+                    <span className="bg-white/30 rounded-lg px-3 py-1">
+                      <span className="text-2xl">{String(countdown.hours).padStart(2, '0')}</span>
+                      <span className="text-lg ml-1">h</span>
+                    </span>
+                    <span className="bg-white/30 rounded-lg px-3 py-1">
+                      <span className="text-2xl">{String(countdown.minutes).padStart(2, '0')}</span>
+                      <span className="text-lg ml-1">m</span>
+                    </span>
+                    <span className={`bg-white/30 rounded-lg px-3 py-1 ${countdown.seconds < 60 && countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 ? 'animate-pulse' : ''}`}>
+                      <span className="text-2xl">{String(countdown.seconds).padStart(2, '0')}</span>
+                      <span className="text-lg ml-1">s</span>
+                    </span>
                   </div>
-                  <div className="text-xs font-semibold uppercase tracking-wider opacity-90">Time Remaining</div>
+                  <div className="text-xs font-semibold uppercase tracking-wider opacity-90 mt-2">Time Remaining</div>
                 </div>
               </div>
             </div>
