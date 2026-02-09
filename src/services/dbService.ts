@@ -124,6 +124,13 @@ export const dbService = {
     });
   },
 
+  async setBhadotActive(id: string, isActive: boolean): Promise<{ success: boolean; bhadot: Bhadot }> {
+    return apiCall(`/bhadot/${id}/active`, {
+      method: 'PUT',
+      body: JSON.stringify({ isActive }),
+    });
+  },
+
   async getTransactions(): Promise<Transaction[]> {
     const fallback: Transaction[] = [];
     return apiCall('/admin/transactions', {}, fallback);

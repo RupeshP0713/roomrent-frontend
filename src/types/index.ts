@@ -14,6 +14,7 @@ export interface Bhadot {
   cast?: string;
   totalFamilyMembers?: number;
   status: 'Waiting' | 'Approved';
+  isActive?: boolean;
   createdAt?: string;
 }
 
@@ -21,7 +22,7 @@ export interface RentRequest {
   id: string;
   malikId: string;
   bhadotId: string;
-  status: 'Pending' | 'Accepted' | 'Rejected';
+  status: 'Pending' | 'Accepted' | 'Rejected' | 'Expired';
   timestamp: string;
 }
 
@@ -29,7 +30,7 @@ export interface RentRequestWithDetails {
   id: string;
   malikId: string;
   bhadotId: string;
-  status: 'Pending' | 'Accepted' | 'Rejected';
+  status: 'Pending' | 'Accepted' | 'Rejected' | 'Expired';
   timestamp: string;
   malikName?: string;
   malikWhatsapp?: string | null;

@@ -36,6 +36,7 @@ export default function BhadotDashboard() {
   const [loading, setLoading] = useState(true); // Loading state
   const [updatingRequest, setUpdatingRequest] = useState<string | null>(null); // Currently updating this request ID
   const [showProfileModal, setShowProfileModal] = useState(false); // Show profile completion modal
+  const [togglingActive, setTogglingActive] = useState(false); // Bhadot active/inactive toggle state
 
   useEffect(() => {
     if (id) {
@@ -142,6 +143,28 @@ export default function BhadotDashboard() {
     }
   };
 
+  /**
+   * Toggle Bhadot active/inactive status
+   * When inactive, this Bhadot will not be visible to any Malik and all active requests are rejected
+   */
+  const handleToggleActive = async () => {
+    if (!id || !bhadot) return;
+    const nextActive = !(bhadot.isActive === false);
+    setTogglingActive(true);
+    try {
+      const result = await dbService.setBhadotActive(id, nextActive);
+      setBhadot(result.bhadot);
+      await loadData();
+      if (!result.bhadot.isActive) {
+        alert('Your profile is now inactive. Landlords will not see you and existing requests have been rejected.');
+      }
+    } catch (error: any) {
+      alert(error.message || 'Failed to update profile status');
+    } finally {
+      setTogglingActive(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -183,7 +206,39 @@ export default function BhadotDashboard() {
         {/* Welcome Card */}
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 border border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('welcome')}, {bhadot.name}!</h2>
-          <p className="text-gray-600">{t('manageRentalRequests')}</p>
+          <p className="text-gray-600 mb-4">{t('manageRentalRequests')}</p>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="text-sm">
+              <span className="font-semibold text-gray-700 mr-2">Profile status:</span>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                bhadot.isActive === false
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-green-100 text-green-700'
+              }`}>
+                {bhadot.isActive === false ? 'Inactive' : 'Active'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleActive}
+              disabled={togglingActive}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold border transition ${
+                bhadot.isActive === false
+                  ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                  : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
+              } disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2`}
+            >
+              {togglingActive ? (
+                <LoadingSpinner size="sm" />
+              ) : (
+                <>
+                  <span>
+                    {bhadot.isActive === false ? 'Set Active' : 'Set Inactive'}
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Available Rooms Counter - LIVE DB INVENTORY */}
