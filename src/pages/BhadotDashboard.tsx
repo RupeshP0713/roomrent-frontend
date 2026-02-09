@@ -37,6 +37,7 @@ export default function BhadotDashboard() {
   const [updatingRequest, setUpdatingRequest] = useState<string | null>(null); // Currently updating this request ID
   const [showProfileModal, setShowProfileModal] = useState(false); // Show profile completion modal
   const [togglingActive, setTogglingActive] = useState(false); // Bhadot active/inactive toggle state
+  const [countdown, setCountdown] = useState<{ days: number; hours: number; minutes: number; seconds: number } | null>(null); // Countdown timer state
 
   useEffect(() => {
     if (id) {
@@ -45,6 +46,45 @@ export default function BhadotDashboard() {
       return () => clearInterval(interval);
     }
   }, [id]);
+
+  // Calculate countdown timer from oldest accepted request
+  useEffect(() => {
+    const acceptedRequests = requests.filter(req => req.status === 'Accepted');
+    if (acceptedRequests.length === 0) {
+      setCountdown(null);
+      return;
+    }
+
+    // Find the oldest accepted request
+    const oldestAccepted = acceptedRequests.reduce((oldest, current) => {
+      const oldestTime = new Date(oldest.timestamp).getTime();
+      const currentTime = new Date(current.timestamp).getTime();
+      return currentTime < oldestTime ? current : oldest;
+    });
+
+    const updateCountdown = () => {
+      const acceptedTime = new Date(oldestAccepted.timestamp).getTime();
+      const fiveDaysLater = acceptedTime + (5 * 24 * 60 * 60 * 1000); // 5 days in milliseconds
+      const now = new Date().getTime();
+      const diff = fiveDaysLater - now;
+
+      if (diff <= 0) {
+        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setCountdown({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [requests]);
 
   /**
    * Load Bhadot profile and rental requests
@@ -241,6 +281,39 @@ export default function BhadotDashboard() {
             </p>
           </div>
         </div>
+
+        {/* 5-Day Countdown Warning - Only show if there's an accepted request */}
+        {countdown !== null && requests.some(req => req.status === 'Accepted') && (
+          <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl shadow-lg p-6 mb-6 text-white">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <h3 className="text-xl font-bold">{t('accountInactiveWarning')}</h3>
+                </div>
+                <p className="text-sm opacity-90 mb-4">{t('accountInactiveMessage')}</p>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-4 border-2 border-white/30">
+                <div className="text-center">
+                  <div className="text-3xl font-bold mb-1">
+                    {countdown.days > 0 ? (
+                      <span>{countdown.days}d {countdown.hours}h {countdown.minutes}m {countdown.seconds}s</span>
+                    ) : countdown.hours > 0 ? (
+                      <span>{countdown.hours}h {countdown.minutes}m {countdown.seconds}s</span>
+                    ) : countdown.minutes > 0 ? (
+                      <span>{countdown.minutes}m {countdown.seconds}s</span>
+                    ) : (
+                      <span className="text-red-200">{countdown.seconds}s</span>
+                    )}
+                  </div>
+                  <div className="text-xs font-semibold uppercase tracking-wider opacity-90">Time Remaining</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Available Rooms Counter - LIVE DB INVENTORY */}
         <div className="bg-green-600 rounded-3xl shadow-lg p-8 mb-6 text-white">

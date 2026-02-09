@@ -171,6 +171,8 @@ const translations: Record<Language, Record<string, string>> = {
     'bhadotStatusActive': 'Active',
     'bhadotStatusInactive': 'Inactive',
     'bhadotStatusHint': 'To show your details to Maliks keep this ON. To hide your details from Maliks turn this OFF.',
+    'accountInactiveWarning': 'Your account will become inactive in',
+    'accountInactiveMessage': 'After 5 days of accepting a request, your account will automatically become inactive. You can reactivate it anytime using the toggle above.',
   },
   hi: {
     // Common
@@ -294,6 +296,8 @@ const translations: Record<Language, Record<string, string>> = {
     'bhadotStatusActive': 'सक्रिय (ON)',
     'bhadotStatusInactive': 'निष्क्रिय (OFF)',
     'bhadotStatusHint': 'मालिक को अपना डेटा दिखाने के लिए इसे ON रखें और मालिक को अपना डेटा नहीं दिखाने के लिए इसे OFF करें।',
+    'accountInactiveWarning': 'आपका खाता निष्क्रिय हो जाएगा',
+    'accountInactiveMessage': 'अनुरोध स्वीकार करने के 5 दिन बाद, आपका खाता स्वचालित रूप से निष्क्रिय हो जाएगा। आप ऊपर दिए गए टॉगल का उपयोग करके इसे कभी भी पुनः सक्रिय कर सकते हैं।',
   }
 };
 
