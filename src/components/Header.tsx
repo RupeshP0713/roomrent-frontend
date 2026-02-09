@@ -6,9 +6,10 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface HeaderProps {
   title: string;
   showLanguageSwitcher?: boolean;
+  onLogout?: () => void;
 }
 
-export default function Header({ title, showLanguageSwitcher = true }: HeaderProps) {
+export default function Header({ title, showLanguageSwitcher = true, onLogout }: HeaderProps) {
   const { t } = useLanguage();
   const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected'>('disconnected');
   const [cloudSync, setCloudSync] = useState<'synced' | 'syncing' | 'offline'>('offline');
@@ -38,30 +39,15 @@ export default function Header({ title, showLanguageSwitcher = true }: HeaderPro
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
           <div className="flex items-center gap-4">
             {showLanguageSwitcher && <LanguageSwitcher />}
-            
-            {/* Cloud Sync Indicator */}
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${
-                cloudSync === 'synced' ? 'bg-green-500 animate-pulse' :
-                cloudSync === 'syncing' ? 'bg-yellow-500 animate-pulse' :
-                'bg-gray-400'
-              }`} />
-              <span className="text-sm font-medium text-gray-600">
-                {cloudSync === 'synced' ? t('cloudSynced') :
-                 cloudSync === 'syncing' ? t('syncing') :
-                 t('offline')}
-              </span>
-            </div>
-
-            {/* DB Status Indicator */}
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${
-                dbStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'
-              }`} />
-              <span className="text-sm font-medium text-gray-600">
-                DB {dbStatus === 'connected' ? t('connected') : t('disconnected')}
-              </span>
-            </div>
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="px-4 py-2 rounded-xl bg-red-50 text-red-600 border border-red-200 text-sm font-semibold hover:bg-red-100 transition"
+              >
+                {t('logout')}
+              </button>
+            )}
           </div>
         </div>
       </div>

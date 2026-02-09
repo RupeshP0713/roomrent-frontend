@@ -174,7 +174,11 @@ export default function BhadotDashboard() {
           onSubmit={handleProfileSubmit}
         />
       )}
-      <Header title={`${t('roomBhadot')} - ${bhadot.name}`} showLanguageSwitcher={true} />
+      <Header
+        title={`${t('roomBhadot')} - ${bhadot.name}`}
+        showLanguageSwitcher={true}
+        onLogout={() => navigate('/')}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Card */}
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 border border-gray-200">

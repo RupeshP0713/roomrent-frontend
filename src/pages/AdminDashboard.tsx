@@ -132,7 +132,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header title="Admin Dashboard" showLanguageSwitcher={false} />
+      <Header
+        title="Admin Dashboard"
+        showLanguageSwitcher={false}
+        onLogout={() => navigate('/admin/login')}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs */}
         <div className="bg-white rounded-3xl shadow-lg mb-6 p-2 flex gap-2">
