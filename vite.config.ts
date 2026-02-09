@@ -10,7 +10,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://roomrent-backend.vercel.app/api',
+        target: 'https://roomrent-backend.vercel.app/api/health',
         changeOrigin: true
       }
     }
