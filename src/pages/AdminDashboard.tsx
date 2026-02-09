@@ -342,20 +342,33 @@ export default function AdminDashboard() {
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() => handleViewMalik(user.id)}
-                                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                      className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm font-medium flex items-center gap-1.5"
+                                      title="View Details"
                                     >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                      </svg>
                                       View
                                     </button>
                                     <button
                                       onClick={() => handleEditMalik(user)}
-                                      className="text-green-600 hover:text-green-800 font-medium text-sm"
+                                      className="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition text-sm font-medium flex items-center gap-1.5"
+                                      title="Edit"
                                     >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
                                       Edit
                                     </button>
                                     <button
                                       onClick={() => handleDeleteUser('Malik', user.id)}
-                                      className="text-red-600 hover:text-red-800 font-medium text-sm"
+                                      className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium flex items-center gap-1.5"
+                                      title="Delete"
                                     >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
                                       Delete
                                     </button>
                                   </div>
@@ -494,20 +507,33 @@ export default function AdminDashboard() {
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() => handleViewBhadot(user.id)}
-                                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                      className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm font-medium flex items-center gap-1.5"
+                                      title="View Details"
                                     >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                      </svg>
                                       View
                                     </button>
                                     <button
                                       onClick={() => handleEditBhadot(user)}
-                                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                                      className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm font-medium flex items-center gap-1.5"
+                                      title="Edit"
                                     >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
                                       Edit
                                     </button>
                                     <button
                                       onClick={() => handleDeleteUser('Bhadot', user.id)}
-                                      className="text-red-600 hover:text-red-800 font-medium text-sm"
+                                      className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium flex items-center gap-1.5"
+                                      title="Delete"
                                     >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
                                       Delete
                                     </button>
                                   </div>
@@ -604,142 +630,172 @@ export default function AdminDashboard() {
       </div>
 
       {viewRole && viewUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 relative">
-            <button
-              type="button"
-              onClick={closeViewModal}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-            >
-              ✕
-            </button>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {viewRole === 'Malik' ? 'Malik Details' : 'Bhadot Details'}
-            </h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4 py-8">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-3xl flex items-center justify-between z-10">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {viewRole === 'Malik' ? 'Malik Details' : 'Bhadot Details'}
+              </h2>
+              <button
+                type="button"
+                onClick={closeViewModal}
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-1.5 transition"
+                title="Close"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-            {viewLoading ? (
-              <div className="py-10 flex items-center justify-center">
-                <LoadingSpinner size="lg" />
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  {viewRole === 'Malik' ? (
-                    <>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">ID</div>
-                        <div className="font-mono text-sm">{(viewUser as Malik).id}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Name</div>
-                        <div className="font-medium">{(viewUser as Malik).name}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">WhatsApp</div>
-                        <div>{(viewUser as Malik).whatsapp}</div>
-                      </div>
-                      <div className="md:col-span-2">
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Address</div>
-                        <div>{(viewUser as Malik).address}</div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">ID</div>
-                        <div className="font-mono text-sm">{(viewUser as Bhadot).id}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Name</div>
-                        <div className="font-medium">{(viewUser as Bhadot).name}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Mobile</div>
-                        <div>{(viewUser as Bhadot).mobile}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Status</div>
-                        <div>{(viewUser as Bhadot).status}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Cast</div>
-                        <div>{(viewUser as Bhadot).cast || '-'}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Family Members</div>
-                        <div>{(viewUser as Bhadot).totalFamilyMembers ?? '-'}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Area</div>
-                        <div>{(viewUser as Bhadot).area || '-'}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-gray-500 uppercase">Active</div>
-                        <div>{(viewUser as Bhadot).isActive === false ? 'Inactive' : 'Active'}</div>
-                      </div>
-                    </>
-                  )}
+            <div className="p-6">
+              {viewLoading ? (
+                <div className="py-20 flex items-center justify-center">
+                  <LoadingSpinner size="lg" />
                 </div>
+              ) : (
+                <>
+                  {/* User Details - Two Column Layout */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {viewRole === 'Malik' ? (
+                      <>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">ID</div>
+                          <div className="font-mono text-sm text-gray-900 font-medium">{(viewUser as Malik).id}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">NAME</div>
+                          <div className="text-gray-900 font-semibold">{(viewUser as Malik).name}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">WHATSAPP</div>
+                          <div className="text-gray-900">{(viewUser as Malik).whatsapp}</div>
+                        </div>
+                        <div className="space-y-1 md:col-span-2">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">ADDRESS</div>
+                          <div className="text-gray-900">{(viewUser as Malik).address}</div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">ID</div>
+                          <div className="font-mono text-sm text-gray-900 font-medium">{(viewUser as Bhadot).id}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">NAME</div>
+                          <div className="text-gray-900 font-semibold">{(viewUser as Bhadot).name}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">MOBILE</div>
+                          <div className="text-gray-900">{(viewUser as Bhadot).mobile}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">STATUS</div>
+                          <div>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              (viewUser as Bhadot).status === 'Approved' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {(viewUser as Bhadot).status}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">CAST</div>
+                          <div className="text-gray-900">{(viewUser as Bhadot).cast || '-'}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">FAMILY MEMBERS</div>
+                          <div className="text-gray-900">{(viewUser as Bhadot).totalFamilyMembers ?? '-'}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">AREA</div>
+                          <div className="text-gray-900">{(viewUser as Bhadot).area || '-'}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">ACTIVE</div>
+                          <div>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              (viewUser as Bhadot).isActive === false
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-green-100 text-green-700'
+                            }`}>
+                              {(viewUser as Bhadot).isActive === false ? 'Inactive' : 'Active'}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Requests</h3>
-                  {viewRequests.length === 0 ? (
-                    <p className="text-sm text-gray-500">No requests found.</p>
-                  ) : (
-                    <div className="max-h-64 overflow-y-auto border border-gray-100 rounded-2xl">
-                      <table className="w-full text-sm">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="text-left py-2 px-3 font-semibold text-gray-700">ID</th>
-                            {viewRole === 'Malik' ? (
-                              <>
-                                <th className="text-left py-2 px-3 font-semibold text-gray-700">Bhadot</th>
-                                <th className="text-left py-2 px-3 font-semibold text-gray-700">Mobile</th>
-                              </>
-                            ) : (
-                              <th className="text-left py-2 px-3 font-semibold text-gray-700">Malik</th>
-                            )}
-                            <th className="text-left py-2 px-3 font-semibold text-gray-700">Status</th>
-                            <th className="text-left py-2 px-3 font-semibold text-gray-700">Time</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {viewRequests.map((req) => (
-                            <tr key={req.id} className="border-t border-gray-100">
-                              <td className="py-2 px-3 font-mono text-xs">{req.id}</td>
-                              {viewRole === 'Malik' ? (
-                                <>
-                                  <td className="py-2 px-3">{req.bhadotName}</td>
-                                  <td className="py-2 px-3 text-gray-600">{req.bhadotMobile}</td>
-                                </>
-                              ) : (
-                                <td className="py-2 px-3">{req.malikName}</td>
-                              )}
-                              <td className="py-2 px-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                  req.status === 'Accepted'
-                                    ? 'bg-green-100 text-green-800'
-                                    : req.status === 'Rejected'
-                                    ? 'bg-red-100 text-red-800'
-                                    : req.status === 'Expired'
-                                    ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                  {req.status}
-                                </span>
-                              </td>
-                              <td className="py-2 px-3 text-gray-500">
-                                {new Date(req.timestamp).toLocaleString()}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+                  {/* Requests Section */}
+                  <div className="border-t border-gray-200 pt-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">Requests</h3>
+                    {viewRequests.length === 0 ? (
+                      <div className="bg-gray-50 rounded-2xl p-8 text-center">
+                        <p className="text-sm text-gray-500">No requests found.</p>
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
+                        <div className="overflow-x-auto max-h-80">
+                          <table className="w-full text-sm">
+                            <thead className="bg-gray-100 border-b border-gray-200">
+                              <tr>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-700 text-xs uppercase">ID</th>
+                                {viewRole === 'Malik' ? (
+                                  <>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-700 text-xs uppercase">Bhadot</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-700 text-xs uppercase">Mobile</th>
+                                  </>
+                                ) : (
+                                  <th className="text-left py-3 px-4 font-semibold text-gray-700 text-xs uppercase">Malik</th>
+                                )}
+                                <th className="text-left py-3 px-4 font-semibold text-gray-700 text-xs uppercase">Status</th>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-700 text-xs uppercase">Time</th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-100">
+                              {viewRequests.map((req) => (
+                                <tr key={req.id} className="hover:bg-gray-50 transition">
+                                  <td className="py-3 px-4 font-mono text-xs text-gray-600">{req.id}</td>
+                                  {viewRole === 'Malik' ? (
+                                    <>
+                                      <td className="py-3 px-4 font-medium text-gray-900">{req.bhadotName || '-'}</td>
+                                      <td className="py-3 px-4 text-gray-600">{req.bhadotMobile || '-'}</td>
+                                    </>
+                                  ) : (
+                                    <td className="py-3 px-4 font-medium text-gray-900">{req.malikName || '-'}</td>
+                                  )}
+                                  <td className="py-3 px-4">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                      req.status === 'Accepted'
+                                        ? 'bg-green-100 text-green-800'
+                                        : req.status === 'Rejected'
+                                        ? 'bg-red-100 text-red-800'
+                                        : req.status === 'Expired'
+                                        ? 'bg-gray-100 text-gray-700'
+                                        : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                      {req.status}
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-4 text-gray-600 text-xs">
+                                    {new Date(req.timestamp).toLocaleString()}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
