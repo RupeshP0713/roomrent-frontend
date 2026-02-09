@@ -37,6 +37,8 @@ export interface RentRequestWithDetails {
   bhadotName?: string;
   bhadotMobile?: string;
   bhadotArea?: string;
+   bhadotCast?: string;
+   bhadotTotalFamilyMembers?: number;
 }
 
 export interface AdminStats {

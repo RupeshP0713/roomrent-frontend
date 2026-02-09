@@ -425,6 +425,16 @@ export default function MalikDashboard() {
                         {bhadot.area && (
                           <p className="text-gray-600">Area: {bhadot.area}</p>
                         )}
+                        {bhadot.cast && (
+                          <p className="text-gray-600">
+                            {t('cast')}: {bhadot.cast}
+                          </p>
+                        )}
+                        {typeof bhadot.totalFamilyMembers === 'number' && bhadot.totalFamilyMembers > 0 && (
+                          <p className="text-gray-600">
+                            {t('totalFamilyMembers')}: {bhadot.totalFamilyMembers}
+                          </p>
+                        )}
                         <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${
                           bhadot.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                         }`}>
@@ -500,6 +510,16 @@ export default function MalikDashboard() {
                       <p className="text-gray-600 mt-1">{t('mobile')}: {maskMobileNumber(request.bhadotMobile || '')}</p>
                       {request.bhadotArea && (
                         <p className="text-gray-600">Area: {request.bhadotArea}</p>
+                      )}
+                      {request.bhadotCast && (
+                        <p className="text-gray-600">
+                          {t('cast')}: {request.bhadotCast}
+                        </p>
+                      )}
+                      {typeof request.bhadotTotalFamilyMembers === 'number' && request.bhadotTotalFamilyMembers > 0 && (
+                        <p className="text-gray-600">
+                          {t('totalFamilyMembers')}: {request.bhadotTotalFamilyMembers}
+                        </p>
                       )}
                       <p className="text-xs text-gray-500 mt-2">
                         {new Date(request.timestamp).toLocaleString()}
