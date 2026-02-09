@@ -57,7 +57,18 @@ async function apiCall<T>(
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
+      // Try to parse error response as JSON
+      let errorMessage = `API error: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.error) {
+          // Include the full error object as JSON string so we can parse it later
+          errorMessage = JSON.stringify(errorData);
+        }
+      } catch {
+        // If JSON parsing fails, use the status text
+      }
+      throw new Error(errorMessage);
     }
 
     return await response.json();

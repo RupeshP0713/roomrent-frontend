@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
+import Toast from '../components/Toast';
 import { dbService } from '../services/dbService';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { AdminStats, User, Transaction, Malik, Bhadot, RentRequestWithDetails } from '../types';
@@ -32,6 +33,9 @@ export default function AdminDashboard() {
   const [viewUser, setViewUser] = useState<Malik | Bhadot | null>(null);
   const [viewRequests, setViewRequests] = useState<RentRequestWithDetails[]>([]);
   const [viewLoading, setViewLoading] = useState(false);
+  
+  // Toast notification state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   useEffect(() => {
     loadData();
@@ -61,8 +65,15 @@ export default function AdminDashboard() {
     try {
       await dbService.deleteUser(role, id);
       await loadData();
+      setToast({
+        message: `${role} deleted successfully!`,
+        type: 'success'
+      });
     } catch (error) {
-      alert('Failed to delete user');
+      setToast({
+        message: 'Failed to delete user',
+        type: 'error'
+      });
     }
   };
 
@@ -90,9 +101,15 @@ export default function AdminDashboard() {
       await dbService.updateMalik(id, editFormData);
       await loadData();
       setEditingMalik(null);
-      alert('Malik updated successfully!');
+      setToast({
+        message: 'Malik updated successfully!',
+        type: 'success'
+      });
     } catch (error: any) {
-      alert(error.message || 'Failed to update Malik');
+      setToast({
+        message: error.message || 'Failed to update Malik',
+        type: 'error'
+      });
     } finally {
       setSaving(false);
     }
@@ -104,9 +121,15 @@ export default function AdminDashboard() {
       await dbService.updateBhadot(id, editFormData);
       await loadData();
       setEditingBhadot(null);
-      alert('Bhadot updated successfully!');
+      setToast({
+        message: 'Bhadot updated successfully!',
+        type: 'success'
+      });
     } catch (error: any) {
-      alert(error.message || 'Failed to update Bhadot');
+      setToast({
+        message: error.message || 'Failed to update Bhadot',
+        type: 'error'
+      });
     } finally {
       setSaving(false);
     }
@@ -129,7 +152,10 @@ export default function AdminDashboard() {
       setViewUser(malik);
       setViewRequests(requests);
     } catch (error) {
-      alert('Failed to load Malik details');
+      setToast({
+        message: 'Failed to load Malik details',
+        type: 'error'
+      });
       setViewRole(null);
       setViewUser(null);
       setViewRequests([]);
@@ -149,7 +175,10 @@ export default function AdminDashboard() {
       setViewUser(bhadot);
       setViewRequests(requests);
     } catch (error) {
-      alert('Failed to load Bhadot details');
+      setToast({
+        message: 'Failed to load Bhadot details',
+        type: 'error'
+      });
       setViewRole(null);
       setViewUser(null);
       setViewRequests([]);
@@ -185,6 +214,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <Header
         title="Admin Dashboard"
         showLanguageSwitcher={false}

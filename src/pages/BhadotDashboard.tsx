@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
+import Toast from '../components/Toast';
 import BhadotProfileModal from '../components/BhadotProfileModal';
 import { dbService } from '../services/dbService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -37,6 +38,7 @@ export default function BhadotDashboard() {
   const [updatingRequest, setUpdatingRequest] = useState<string | null>(null); // Currently updating this request ID
   const [showProfileModal, setShowProfileModal] = useState(false); // Show profile completion modal
   const [togglingActive, setTogglingActive] = useState(false); // Bhadot active/inactive toggle state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null); // Toast notification state
   const [countdown, setCountdown] = useState<{ days: number; hours: number; minutes: number; seconds: number } | null>(null); // Countdown timer state
 
   useEffect(() => {
@@ -142,9 +144,15 @@ export default function BhadotDashboard() {
     try {
       await dbService.updateRequestStatus(requestId, status);
       await loadData(); // Reload to show updated status
-      alert(`Request ${status.toLowerCase()} successfully!`);
+      setToast({
+        message: `Request ${status.toLowerCase()} successfully!`,
+        type: 'success'
+      });
     } catch (error: any) {
-      alert(error.message || 'Failed to update request');
+      setToast({
+        message: error.message || 'Failed to update request',
+        type: 'error'
+      });
     } finally {
       setUpdatingRequest(null);
     }
@@ -198,10 +206,21 @@ export default function BhadotDashboard() {
       setBhadot(result.bhadot);
       await loadData();
       if (!result.bhadot.isActive) {
-        alert('Your profile is now inactive. Landlords will not see you and existing requests have been rejected.');
+        setToast({
+          message: 'Your profile is now inactive. Landlords will not see you and existing requests have been rejected.',
+          type: 'info'
+        });
+      } else {
+        setToast({
+          message: 'Your profile is now active. Landlords can see your details.',
+          type: 'success'
+        });
       }
     } catch (error: any) {
-      alert(error.message || 'Failed to update profile status');
+      setToast({
+        message: error.message || 'Failed to update profile status',
+        type: 'error'
+      });
     } finally {
       setTogglingActive(false);
     }
@@ -233,6 +252,13 @@ export default function BhadotDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       {showProfileModal && bhadot && (
         <BhadotProfileModal
           bhadotName={bhadot.name}

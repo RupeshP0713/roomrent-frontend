@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
+import Toast from '../components/Toast';
 import { dbService } from '../services/dbService';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Malik, Bhadot, RentRequestWithDetails } from '../types';
@@ -48,6 +49,12 @@ export default function MalikDashboard() {
   const [nextAvailableTime, setNextAvailableTime] = useState<Date | null>(null); // When next request can be sent
   const [timeRemaining, setTimeRemaining] = useState<string>(''); // Countdown timer display
   const [activeTab, setActiveTab] = useState<'tenants' | 'requests'>('tenants'); // Tab state
+  
+  // Toast notification state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  
+  // Per-tenant cooldown tracking (24 hours from last request to that tenant)
+  const [tenantCooldowns, setTenantCooldowns] = useState<Record<string, { until: Date; hoursRemaining: number }>>({});
 
   // Load data when component mounts or ID changes
   useEffect(() => {
@@ -88,6 +95,37 @@ export default function MalikDashboard() {
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
   }, [nextAvailableTime, canSendMore]);
+
+  // Update per-tenant cooldowns every 30 seconds for real-time updates
+  useEffect(() => {
+    const updateCooldowns = () => {
+      const now = new Date();
+      const updatedCooldowns: Record<string, { until: Date; hoursRemaining: number }> = {};
+      let hasChanges = false;
+      
+      Object.entries(tenantCooldowns).forEach(([bhadotId, cooldown]) => {
+        const diff = cooldown.until.getTime() - now.getTime();
+        const hoursRemaining = Math.ceil(diff / (1000 * 60 * 60));
+        if (diff > 0 && hoursRemaining > 0) {
+          updatedCooldowns[bhadotId] = { until: cooldown.until, hoursRemaining };
+        } else {
+          hasChanges = true; // Cooldown expired
+        }
+      });
+      
+      if (hasChanges || Object.keys(updatedCooldowns).length !== Object.keys(tenantCooldowns).length) {
+        setTenantCooldowns(updatedCooldowns);
+        // Reload data if any cooldown expired to refresh button states
+        if (hasChanges && id) {
+          setTimeout(() => loadData(), 1000);
+        }
+      }
+    };
+    
+    updateCooldowns();
+    const interval = setInterval(updateCooldowns, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, [tenantCooldowns, id]);
 
   useEffect(() => {
     if (malik) {
@@ -142,6 +180,24 @@ export default function MalikDashboard() {
         setNextAvailableTime(null);
       }
       
+      // Calculate per-tenant cooldowns (24 hours from last request to each tenant)
+      // Check all requests (Pending, Accepted, Rejected, Expired) for cooldown
+      const cooldowns: Record<string, { until: Date; hoursRemaining: number }> = {};
+      requestsData.forEach(req => {
+        const requestTime = new Date(req.timestamp);
+        const cooldownUntil = new Date(requestTime.getTime() + 24 * 60 * 60 * 1000);
+        const diff = cooldownUntil.getTime() - now.getTime();
+        const hoursRemaining = Math.ceil(diff / (1000 * 60 * 60));
+        
+        if (diff > 0 && hoursRemaining > 0) {
+          // Track the most recent cooldown for each tenant
+          if (!cooldowns[req.bhadotId] || cooldowns[req.bhadotId].until < cooldownUntil) {
+            cooldowns[req.bhadotId] = { until: cooldownUntil, hoursRemaining };
+          }
+        }
+      });
+      setTenantCooldowns(cooldowns);
+      
       // Update request limit status
       setPendingCount(activePending.length);
       setCanSendMore(activePending.length < 2); // Max 2 pending requests allowed
@@ -161,7 +217,20 @@ export default function MalikDashboard() {
     
     // Check if request limit has been reached
     if (!canSendMore) {
-      alert('Maximum 2 pending requests allowed. Please wait 24 hours after your oldest pending request to send more.');
+      setToast({
+        message: 'Maximum 2 pending requests allowed. Please wait 24 hours after your oldest pending request to send more.',
+        type: 'error'
+      });
+      return;
+    }
+    
+    // Check per-tenant cooldown
+    const cooldown = tenantCooldowns[bhadotId];
+    if (cooldown && cooldown.hoursRemaining > 0) {
+      setToast({
+        message: `You can send a new request to this tenant after ${cooldown.hoursRemaining} hour(s).`,
+        type: 'error'
+      });
       return;
     }
     
@@ -169,9 +238,33 @@ export default function MalikDashboard() {
     try {
       await dbService.sendRentalRequest(id, bhadotId);
       await loadData(); // Reload data to update request count
-      alert('Rental request sent successfully!');
+      setToast({
+        message: 'Rental request sent successfully!',
+        type: 'success'
+      });
     } catch (error: any) {
-      alert(error.message || 'Failed to send request');
+      // Parse error response to get hoursRemaining if available
+      let errorMessage = 'Failed to send request';
+      try {
+        if (error.message) {
+          const errorData = JSON.parse(error.message);
+          if (errorData.error && errorData.hoursRemaining !== undefined) {
+            errorMessage = `You can send a new request to this tenant after ${errorData.hoursRemaining} hour(s).`;
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          }
+        }
+      } catch {
+        // If parsing fails, use the original error message
+        if (error.message) {
+          errorMessage = error.message;
+        }
+      }
+      
+      setToast({
+        message: errorMessage,
+        type: 'error'
+      });
     } finally {
       setSendingRequest(null);
     }
@@ -187,10 +280,16 @@ export default function MalikDashboard() {
       if (result.success) {
         setMalik(result.malik);
         setEditingAddress(false);
-        alert('Address updated successfully!');
+        setToast({
+          message: 'Address updated successfully!',
+          type: 'success'
+        });
       }
     } catch (error: any) {
-      alert(error.message || 'Failed to update address');
+      setToast({
+        message: error.message || 'Failed to update address',
+        type: 'error'
+      });
     } finally {
       setSavingAddress(false);
     }
@@ -241,6 +340,13 @@ export default function MalikDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <Header
         title={`${t('makanMalik')} - ${malik.name}`}
         showLanguageSwitcher={true}
@@ -417,6 +523,14 @@ export default function MalikDashboard() {
                 const hasPendingRequest = requests.some(
                   req => req.bhadotId === bhadot.id && req.status === 'Pending'
                 );
+                const hasRejectedRequest = requests.some(
+                  req => req.bhadotId === bhadot.id && req.status === 'Rejected'
+                );
+                const cooldown = tenantCooldowns[bhadot.id];
+                const isOnCooldown = cooldown && cooldown.hoursRemaining > 0;
+                // Disable if: pending request, rejected request (within cooldown), sending, global limit reached, or on cooldown
+                const isDisabled = hasPendingRequest || (hasRejectedRequest && isOnCooldown) || sendingRequest === bhadot.id || !canSendMore || isOnCooldown;
+                
                 return (
                   <div
                     key={bhadot.id}
@@ -448,9 +562,9 @@ export default function MalikDashboard() {
                       <div className="ml-4 flex flex-col items-end gap-2">
                         <button
                           onClick={() => handleSendRequest(bhadot.id)}
-                          disabled={hasPendingRequest || sendingRequest === bhadot.id || !canSendMore}
+                          disabled={isDisabled}
                           className={`px-6 py-2 rounded-xl font-semibold transition ${
-                            hasPendingRequest || !canSendMore
+                            isDisabled
                               ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                               : 'bg-green-600 text-white hover:bg-green-700'
                           }`}
@@ -463,6 +577,26 @@ export default function MalikDashboard() {
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                               {t('requestSent')}
+                            </span>
+                          ) : hasRejectedRequest && isOnCooldown ? (
+                            <span className="flex items-center gap-2">
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                              </svg>
+                              {cooldown.hoursRemaining > 0 
+                                ? `${cooldown.hoursRemaining}h cooldown`
+                                : 'On cooldown'
+                              }
+                            </span>
+                          ) : isOnCooldown ? (
+                            <span className="flex items-center gap-2">
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                              </svg>
+                              {cooldown.hoursRemaining > 0 
+                                ? `${cooldown.hoursRemaining}h cooldown`
+                                : 'On cooldown'
+                              }
                             </span>
                           ) : !canSendMore ? (
                             <span className="flex items-center gap-2">
@@ -480,7 +614,21 @@ export default function MalikDashboard() {
                             </span>
                           )}
                         </button>
-                        {!canSendMore && !hasPendingRequest && (
+                        {(isOnCooldown || (hasRejectedRequest && isOnCooldown)) && (() => {
+                          const now = new Date();
+                          const diff = cooldown.until.getTime() - now.getTime();
+                          const hours = Math.floor(diff / (1000 * 60 * 60));
+                          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                          return (
+                            <p className="text-xs text-orange-600 text-right max-w-[120px]">
+                              {hours > 0 
+                                ? `Available in ${hours}h ${minutes}m`
+                                : `Available in ${minutes}m`
+                              }
+                            </p>
+                          );
+                        })()}
+                        {!canSendMore && !hasPendingRequest && !isOnCooldown && (
                           <p className="text-xs text-red-600 text-right max-w-[120px]">
                             {timeRemaining && `${t('availableIn')} ${timeRemaining}`}
                           </p>
