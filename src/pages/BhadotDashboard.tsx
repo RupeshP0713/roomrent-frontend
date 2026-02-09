@@ -149,7 +149,9 @@ export default function BhadotDashboard() {
    */
   const handleToggleActive = async () => {
     if (!id || !bhadot) return;
-    const nextActive = !(bhadot.isActive === false);
+    // Treat undefined as active by default, then flip
+    const currentActive = bhadot.isActive !== false;
+    const nextActive = !currentActive;
     setTogglingActive(true);
     try {
       const result = await dbService.setBhadotActive(id, nextActive);
