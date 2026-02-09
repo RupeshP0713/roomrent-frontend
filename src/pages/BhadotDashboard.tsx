@@ -207,37 +207,52 @@ export default function BhadotDashboard() {
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 border border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('welcome')}, {bhadot.name}!</h2>
           <p className="text-gray-600 mb-4">{t('manageRentalRequests')}</p>
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="text-sm">
-              <span className="font-semibold text-gray-700 mr-2">Profile status:</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                bhadot.isActive === false
-                  ? 'bg-red-100 text-red-700'
-                  : 'bg-green-100 text-green-700'
-              }`}>
-                {bhadot.isActive === false ? 'Inactive' : 'Active'}
-              </span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="text-sm font-semibold text-gray-700">
+                {t('bhadotProfileStatusLabel')}:
+              </div>
+              <button
+                type="button"
+                onClick={handleToggleActive}
+                disabled={togglingActive}
+                className="flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="relative w-20 h-9 rounded-full bg-gray-300 flex items-center justify-between px-1">
+                  <div
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                      bhadot.isActive === false
+                        ? 'bg-red-500 text-white shadow-md'
+                        : 'bg-gray-500 text-gray-200'
+                    }`}
+                  >
+                    OFF
+                  </div>
+                  <div
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                      bhadot.isActive === false
+                        ? 'bg-gray-500 text-gray-200'
+                        : 'bg-green-500 text-white shadow-md'
+                    }`}
+                  >
+                    ON
+                  </div>
+                  <div
+                    className={`absolute top-1 w-7 h-7 rounded-full transition-transform duration-200 ${
+                      bhadot.isActive === false
+                        ? 'translate-x-0 bg-red-500 shadow-lg'
+                        : 'translate-x-10 bg-green-500 shadow-lg'
+                    }`}
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-800">
+                  {bhadot.isActive === false ? t('bhadotStatusInactive') : t('bhadotStatusActive')}
+                </span>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleToggleActive}
-              disabled={togglingActive}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold border transition ${
-                bhadot.isActive === false
-                  ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
-                  : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'
-              } disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2`}
-            >
-              {togglingActive ? (
-                <LoadingSpinner size="sm" />
-              ) : (
-                <>
-                  <span>
-                    {bhadot.isActive === false ? 'Set Active' : 'Set Inactive'}
-                  </span>
-                </>
-              )}
-            </button>
+            <p className="text-xs text-gray-500">
+              {t('bhadotStatusHint')}
+            </p>
           </div>
         </div>
 

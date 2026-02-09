@@ -167,6 +167,10 @@ const translations: Record<Language, Record<string, string>> = {
     'submitting': 'Submitting...',
     'submitContinue': 'Submit & Continue',
     'infoRequired': 'This information is required to continue. Please fill all fields.',
+    'bhadotProfileStatusLabel': 'Profile status',
+    'bhadotStatusActive': 'Active',
+    'bhadotStatusInactive': 'Inactive',
+    'bhadotStatusHint': 'To show your details to Maliks keep this ON. To hide your details from Maliks turn this OFF.',
   },
   hi: {
     // Common
@@ -286,6 +290,10 @@ const translations: Record<Language, Record<string, string>> = {
     'submitting': 'जमा हो रहा है...',
     'submitContinue': 'जमा करें और जारी रखें',
     'infoRequired': 'यह जानकारी जारी रखने के लिए आवश्यक है। कृपया सभी फ़ील्ड भरें।',
+    'bhadotProfileStatusLabel': 'प्रोफाइल स्थिति',
+    'bhadotStatusActive': 'सक्रिय (ON)',
+    'bhadotStatusInactive': 'निष्क्रिय (OFF)',
+    'bhadotStatusHint': 'मालिक को अपना डेटा दिखाने के लिए इसे ON रखें और मालिक को अपना डेटा नहीं दिखाने के लिए इसे OFF करें।',
   }
 };
 
