@@ -13,8 +13,12 @@ interface Message {
 
 interface Conversation {
     _id: string;
-    count: number;
-    role: string; // The role of the sender (Malik/Bhadot)
+    role: string;
+    name: string;
+    contact: string;
+    unreadCount: number;
+    lastMessage: string;
+    timestamp: string;
 }
 
 export default function AdminChat() {
@@ -28,7 +32,7 @@ export default function AdminChat() {
     // Fetch unread conversations
     const fetchConversations = async () => {
         try {
-            const response = await messageApi.getUnreadCount();
+            const response = await messageApi.getConversations();
             setConversations(response.data);
         } catch (error) {
             console.error('Failed to fetch conversations', error);
@@ -113,14 +117,24 @@ export default function AdminChat() {
                                 className={`p-4 cursor-pointer hover:bg-white transition border-b border-gray-100 ${selectedUser?.id === conv._id ? 'bg-white border-l-4 border-l-blue-600 shadow-sm' : ''
                                     }`}
                             >
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">{conv._id}</h3>
-                                        <span className="text-xs text-gray-500 uppercase tracking-wider">{conv.role}</span>
+                                <div className="flex justify-between items-start gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-baseline mb-0.5">
+                                            <h3 className="font-semibold text-gray-900 truncate text-sm">{conv.name || conv._id}</h3>
+                                            <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">
+                                                {new Date(conv.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mb-1 font-mono">{conv.contact}</p>
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-sm text-gray-600 truncate flex-1 pr-2">{conv.lastMessage}</p>
+                                            {conv.unreadCount > 0 && (
+                                                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center shadow-sm">
+                                                    {conv.unreadCount}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                                        {conv.count}
-                                    </span>
                                 </div>
                             </div>
                         ))
@@ -135,8 +149,14 @@ export default function AdminChat() {
                         {/* Header */}
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                             <div>
-                                <h3 className="font-bold text-gray-800">Chat with {selectedUser.id}</h3>
-                                <span className="text-xs text-gray-500 capitalize">{selectedUser.role}</span>
+                                <h3 className="font-bold text-gray-800">Chat with {
+                                    conversations.find(c => c._id === selectedUser.id)?.name || selectedUser.id
+                                }</h3>
+                                <div className="flex gap-2 text-xs text-gray-500 capitalize items-center">
+                                    <span>{selectedUser.role}</span>
+                                    <span>•</span>
+                                    <span>{conversations.find(c => c._id === selectedUser.id)?.contact}</span>
+                                </div>
                             </div>
                         </div>
 
@@ -151,8 +171,8 @@ export default function AdminChat() {
                                         <div key={msg._id} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
                                             <div
                                                 className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm ${isAdmin
-                                                        ? 'bg-blue-600 text-white rounded-br-none'
-                                                        : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
+                                                    ? 'bg-blue-600 text-white rounded-br-none'
+                                                    : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
                                                     }`}
                                             >
                                                 <p>{msg.content}</p>

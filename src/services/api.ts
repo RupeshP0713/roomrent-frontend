@@ -82,6 +82,8 @@ export const messageApi = {
     markAsRead: (senderId?: string) => api.put('/messages/read', { senderId }),
 
     getUnreadCount: () => api.get('/messages/unread-count'),
+
+    getConversations: () => api.get('/messages/conversations'),
 };
 
 export default api;
