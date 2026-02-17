@@ -66,4 +66,22 @@ export const searchApi = {
     searchUser: (number: string) => api.get(`/search/${number}`),
 };
 
+// Message API
+export const messageApi = {
+    sendMessage: (data: { receiverId: string; receiverRole: string; content: string }) =>
+        api.post('/messages/send', data),
+
+    getMessages: (userId?: string, userRole?: string) => {
+        let url = '/messages/conversation';
+        if (userId && userRole) {
+            url += `/${userId}/${userRole}`;
+        }
+        return api.get(url);
+    },
+
+    markAsRead: (senderId?: string) => api.put('/messages/read', { senderId }),
+
+    getUnreadCount: () => api.get('/messages/unread-count'),
+};
+
 export default api;

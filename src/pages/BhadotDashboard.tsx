@@ -17,6 +17,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
+import ChatWidget from '../components/ChatWidget';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
 import BhadotProfileModal from '../components/BhadotProfileModal';
@@ -462,6 +463,7 @@ export default function BhadotDashboard() {
           </button>
         </div>
       </div>
+      <ChatWidget userId={id!} role="Bhadot" />
     </div>
   );
 }
