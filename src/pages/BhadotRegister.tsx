@@ -272,6 +272,7 @@ export default function BhadotRegister() {
                     <option value="Gujrati">{t('gujrati')}</option>
                     <option value="Marwadi">{t('marwadi')}</option>
                     <option value="Bhari">{t('bhari')}</option>
+                    <option value="MP">{t('mp')}</option>
                     <option value="UP">{t('up')}</option>
                     <option value="Other">{t('other')}</option>
                   </select>

@@ -105,7 +105,7 @@ export default function ChatWidget({ userId, role }: { userId: string; role: str
                     {/* Header */}
                     <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-t-2xl flex justify-between items-center text-white">
                         <h3 className="font-bold flex items-center gap-2">
-                            <span>💬</span> {t('supportChat') || 'Support Chat'}
+                            <span>💬</span> {t('supportChat')}
                         </h3>
                         <button
                             onClick={() => setIsOpen(false)}
@@ -119,7 +119,7 @@ export default function ChatWidget({ userId, role }: { userId: string; role: str
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
                         {messages.length === 0 ? (
                             <div className="text-center text-gray-500 mt-10 text-sm">
-                                <p>{t('startConversation') || 'Start a conversation with Admin'}</p>
+                                <p>{t('startConversation')}</p>
                             </div>
                         ) : (
                             messages.map((msg) => {
@@ -131,8 +131,8 @@ export default function ChatWidget({ userId, role }: { userId: string; role: str
                                     >
                                         <div
                                             className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${isMe
-                                                    ? 'bg-blue-600 text-white rounded-br-none'
-                                                    : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
+                                                ? 'bg-blue-600 text-white rounded-br-none'
+                                                : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
                                                 }`}
                                         >
                                             <p>{msg.content}</p>
@@ -154,7 +154,7 @@ export default function ChatWidget({ userId, role }: { userId: string; role: str
                                 type="text"
                                 value={newMessage}
                                 onChange={(e) => setNewMessage(e.target.value)}
-                                placeholder={t('typeMessage') || 'Type a message...'}
+                                placeholder={t('typeMessage')}
                                 className="flex-1 border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                             />
                             <button
@@ -181,7 +181,7 @@ export default function ChatWidget({ userId, role }: { userId: string; role: str
                         </span>
                     )}
                     <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">
-                        {t('chatWithAdmin') || 'Chat with Admin'}
+                        {t('chatWithAdmin')}
                     </span>
                 </button>
             )}

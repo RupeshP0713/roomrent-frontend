@@ -61,7 +61,7 @@ const translations: Record<Language, Record<string, string>> = {
     'loading': 'Loading...',
     'error': 'Error',
     'success': 'Success',
-    
+
     // Role Switcher
     'roomRentConnect': 'Room Rent Connect',
     'chooseRole': 'Choose your role to continue',
@@ -71,7 +71,7 @@ const translations: Record<Language, Record<string, string>> = {
     'landlordPortal': 'Landlord Portal',
     'roomBhadot': 'Room Bhadot',
     'tenantPortal': 'Tenant Portal',
-    
+
     // Admin
     'adminLogin': 'Admin Login',
     'enterCredentials': 'Enter your credentials to access the admin dashboard',
@@ -80,7 +80,7 @@ const translations: Record<Language, Record<string, string>> = {
     'login': 'Login',
     'loggingIn': 'Logging in...',
     'invalidCredentials': 'Invalid credentials',
-    
+
     // Malik Registration
     'makanMalikRegistration': 'Makan Malik Registration',
     'registerAsLandlord': 'Register as a Landlord',
@@ -95,7 +95,7 @@ const translations: Record<Language, Record<string, string>> = {
     'enterAddress': 'Enter your address',
     'register': 'Register',
     'registering': 'Registering...',
-    
+
     // Malik Dashboard
     'searchAvailableTenants': 'Search for available tenants and send rental requests',
     'allTenants': 'All Tenants',
@@ -126,7 +126,7 @@ const translations: Record<Language, Record<string, string>> = {
     'disconnected': 'Disconnected',
     'saving': 'Saving...',
     'noTenantsFound': 'No available tenants found',
-    
+
     // Bhadot Registration
     'roomBhadotRegistration': 'Room Bhadot Registration',
     'registerAsTenant': 'Register as a Tenant',
@@ -140,10 +140,11 @@ const translations: Record<Language, Record<string, string>> = {
     'marathi': 'Marathi',
     'gujrati': 'Gujrati',
     'marwadi': 'Marwadi',
-    'bhari': 'Bhari',
+    'bhari': 'Bihari',
+    'mp': 'M.P.',
     'up': 'UP',
     'other': 'Other',
-    
+
     // Bhadot Dashboard
     'manageRentalRequests': 'Manage your rental requests from landlords',
     'liveDbInventory': 'LIVE DB INVENTORY',
@@ -173,6 +174,12 @@ const translations: Record<Language, Record<string, string>> = {
     'bhadotStatusHint': 'To show your details to Maliks keep this ON. To hide your details from Maliks turn this OFF.',
     'accountInactiveWarning': 'Your account will become inactive in',
     'accountInactiveMessage': 'After 5 days of accepting a request, your account will automatically become inactive. You can reactivate it anytime using the toggle above.',
+
+    // Chat Widget
+    'supportChat': 'Support Chat',
+    'startConversation': 'Start a conversation with Admin',
+    'typeMessage': 'Type a message...',
+    'chatWithAdmin': 'Chat with Admin',
   },
   hi: {
     // Common
@@ -186,7 +193,7 @@ const translations: Record<Language, Record<string, string>> = {
     'loading': 'लोड हो रहा है...',
     'error': 'त्रुटि',
     'success': 'सफल',
-    
+
     // Role Switcher
     'roomRentConnect': 'रूम रेंट कनेक्ट',
     'chooseRole': 'जारी रखने के लिए अपनी भूमिका चुनें',
@@ -196,7 +203,7 @@ const translations: Record<Language, Record<string, string>> = {
     'landlordPortal': 'मकान मालिक पोर्टल',
     'roomBhadot': 'रूम भड़ोत',
     'tenantPortal': 'किरायेदार पोर्टल',
-    
+
     // Admin
     'adminLogin': 'एडमिन लॉगिन',
     'enterCredentials': 'एडमिन डैशबोर्ड तक पहुंचने के लिए अपनी साख दर्ज करें',
@@ -205,7 +212,7 @@ const translations: Record<Language, Record<string, string>> = {
     'login': 'लॉगिन',
     'loggingIn': 'लॉगिन हो रहा है...',
     'invalidCredentials': 'अमान्य साख',
-    
+
     // Malik Registration
     'makanMalikRegistration': 'मकान मालिक पंजीकरण',
     'registerAsLandlord': 'मकान मालिक के रूप में पंजीकरण करें',
@@ -220,7 +227,7 @@ const translations: Record<Language, Record<string, string>> = {
     'enterAddress': 'अपना पता दर्ज करें',
     'register': 'पंजीकरण करें',
     'registering': 'पंजीकरण हो रहा है...',
-    
+
     // Malik Dashboard
     'searchAvailableTenants': 'उपलब्ध किरायेदारों की खोज करें और किराया अनुरोध भेजें',
     'allTenants': 'सभी किरायेदार',
@@ -244,7 +251,7 @@ const translations: Record<Language, Record<string, string>> = {
     'pending': 'लंबित',
     'accepted': 'स्वीकृत',
     'rejected': 'अस्वीकृत',
-    
+
     // Bhadot Registration
     'roomBhadotRegistration': 'रूम भड़ोत पंजीकरण',
     'registerAsTenant': 'किरायेदार के रूप में पंजीकरण करें',
@@ -258,10 +265,11 @@ const translations: Record<Language, Record<string, string>> = {
     'marathi': 'मराठी',
     'gujrati': 'गुजराती',
     'marwadi': 'मारवाड़ी',
-    'bhari': 'भारी',
+    'bhari': 'बिहारी',
+    'mp': 'एम.पी.',
     'up': 'यूपी',
     'other': 'अन्य',
-    
+
     // Bhadot Dashboard
     'manageRentalRequests': 'मकान मालिकों से किराया अनुरोध प्रबंधित करें',
     'liveDbInventory': 'लाइव डीबी इन्वेंटरी',
@@ -298,6 +306,12 @@ const translations: Record<Language, Record<string, string>> = {
     'bhadotStatusHint': 'मालिक को अपना डेटा दिखाने के लिए इसे ON रखें और मालिक को अपना डेटा नहीं दिखाने के लिए इसे OFF करें।',
     'accountInactiveWarning': 'आपका खाता निष्क्रिय हो जाएगा',
     'accountInactiveMessage': 'अनुरोध स्वीकार करने के 5 दिन बाद, आपका खाता स्वचालित रूप से निष्क्रिय हो जाएगा। आप ऊपर दिए गए टॉगल का उपयोग करके इसे कभी भी पुनः सक्रिय कर सकते हैं।',
+
+    // Chat Widget
+    'supportChat': 'सहायता चैट',
+    'startConversation': 'एडमिन के साथ बातचीत शुरू करें',
+    'typeMessage': 'संदेश टाइप करें...',
+    'chatWithAdmin': 'एडमिन से चैट करें',
   }
 };
 
