@@ -20,7 +20,7 @@ import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
 import BhadotProfileModal from '../components/BhadotProfileModal';
-import { dbService } from '../services/dbService';
+import { bhadotApi } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Bhadot, RentRequestWithDetails } from '../types';
 
@@ -29,7 +29,7 @@ export default function BhadotDashboard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useLanguage();
-  
+
   // State Management
   const [bhadot, setBhadot] = useState<Bhadot | null>(null); // Current Bhadot user data
   const [availableRooms, setAvailableRooms] = useState(0); // Live count of available rooms
@@ -97,21 +97,25 @@ export default function BhadotDashboard() {
     setLoading(true);
     try {
       // Fetch Bhadot data and requests in parallel
-      const [bhadotData, requestsData] = await Promise.all([
-        dbService.getBhadot(id),
-        dbService.getBhadotRequests(id),
+      const [bhadotRes, requestsRes] = await Promise.all([
+        bhadotApi.getById(id),
+        bhadotApi.getRequests(id),
       ]);
-      
-      setBhadot(bhadotData);
-      setRequests(requestsData);
-      
+
+      setBhadot(bhadotRes.data);
+      setRequests(requestsRes.data);
+
       // Check if profile is incomplete (for existing users who registered before this feature)
       // Show modal if cast or family members info is missing
+      const bhadotData = bhadotRes.data;
       if (bhadotData && (!bhadotData.cast || !bhadotData.totalFamilyMembers || bhadotData.totalFamilyMembers === 0)) {
         setShowProfileModal(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load data:', error);
+      if (error.status === 401 || error.response?.status === 401) {
+        navigate('/bhadot/register');
+      }
     } finally {
       setLoading(false);
     }
@@ -123,8 +127,8 @@ export default function BhadotDashboard() {
    */
   const loadAvailableRooms = async () => {
     try {
-      const result = await dbService.getAvailableRoomsCount();
-      setAvailableRooms(result.count);
+      const response = await bhadotApi.getAvailableRooms();
+      setAvailableRooms(response.data.count);
     } catch (error) {
       console.error('Failed to load available rooms:', error);
     }
@@ -142,7 +146,7 @@ export default function BhadotDashboard() {
   const handleUpdateRequest = async (requestId: string, status: 'Accepted' | 'Rejected') => {
     setUpdatingRequest(requestId);
     try {
-      await dbService.updateRequestStatus(requestId, status);
+      await bhadotApi.updateRequestStatus(requestId, status);
       await loadData(); // Reload to show updated status
       setToast({
         message: `Request ${status.toLowerCase()} successfully!`,
@@ -178,11 +182,13 @@ export default function BhadotDashboard() {
   const handleProfileSubmit = async (data: { cast: string; totalFamilyMembers: number }) => {
     if (!id) return;
     try {
-      await dbService.updateBhadot(id, {
+      await bhadotApi.update(id, {
         name: bhadot?.name || '',
         mobile: bhadot?.mobile || '',
         cast: data.cast,
         totalFamilyMembers: data.totalFamilyMembers
+        // Note: update requires all fields or just partial?
+        // In api.ts it calls getById then update. logic should be robust.
       });
       await loadData(); // Reload to refresh profile data
       setShowProfileModal(false); // Close modal after successful submission
@@ -202,10 +208,11 @@ export default function BhadotDashboard() {
     const nextActive = !currentActive;
     setTogglingActive(true);
     try {
-      const result = await dbService.setBhadotActive(id, nextActive);
-      setBhadot(result.bhadot);
+      const response = await bhadotApi.toggleActive(id, nextActive);
+      const updatedBhadot = response.data.bhadot;
+      setBhadot(updatedBhadot);
       await loadData();
-      if (!result.bhadot.isActive) {
+      if (!updatedBhadot.isActive) {
         setToast({
           message: 'Your profile is now inactive. Landlords will not see you and existing requests have been rejected.',
           type: 'info'
@@ -268,7 +275,10 @@ export default function BhadotDashboard() {
       <Header
         title={`${t('roomBhadot')} - ${bhadot.name}`}
         showLanguageSwitcher={true}
-        onLogout={() => navigate('/')}
+        onLogout={() => {
+          localStorage.removeItem('token');
+          navigate('/');
+        }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Card */}
@@ -288,11 +298,10 @@ export default function BhadotDashboard() {
               >
                 <div className="relative w-20 h-9 rounded-full bg-gray-300 flex items-center px-1">
                   <div
-                    className={`absolute top-1 left-1 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-md transition-transform duration-200 ${
-                      bhadot.isActive === false
-                        ? 'bg-red-500 translate-x-0'
-                        : 'bg-green-500 translate-x-10'
-                    }`}
+                    className={`absolute top-1 left-1 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-md transition-transform duration-200 ${bhadot.isActive === false
+                      ? 'bg-red-500 translate-x-0'
+                      : 'bg-green-500 translate-x-10'
+                      }`}
                   >
                     {bhadot.isActive === false ? 'OFF' : 'ON'}
                   </div>
@@ -456,4 +465,3 @@ export default function BhadotDashboard() {
     </div>
   );
 }
-

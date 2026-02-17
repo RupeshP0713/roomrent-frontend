@@ -6,7 +6,7 @@
  * Step 2: Enter name, cast, and family members details
  * 
  * Features:
- * - Auto-login if user already exists
+ * - Login if user already exists
  * - Phone number validation
  * - Cast selection with "Other" option
  * - Family members count validation
@@ -15,7 +15,7 @@
  */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { dbService } from '../services/dbService';
+import { bhadotApi, searchApi } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -23,9 +23,9 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 export default function BhadotRegister() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  
+
   // Form state management
-  const [step, setStep] = useState<'phone' | 'details'>('phone'); // Current step in registration
+  const [step, setStep] = useState<'phone' | 'details' | 'login'>('phone'); // Current step in registration
   const [mobile, setMobile] = useState(''); // Mobile number input
   const [formData, setFormData] = useState({
     name: '',
@@ -33,8 +33,9 @@ export default function BhadotRegister() {
     cast: '',
     customCast: '', // Custom cast when "Other" is selected
     totalFamilyMembers: '',
+    password: '', // Added password
   });
-  
+
   // UI state management
   const [loading, setLoading] = useState(false); // Registration in progress
   const [error, setError] = useState(''); // Error message display
@@ -43,7 +44,7 @@ export default function BhadotRegister() {
   /**
    * Handle phone number search
    * Searches for existing user by mobile number
-   * Auto-logs in if user exists, otherwise proceeds to registration
+   * Logs in if user exists, otherwise proceeds to registration
    */
   const handlePhoneSearch = async () => {
     // Clean phone number (remove non-digits)
@@ -56,14 +57,14 @@ export default function BhadotRegister() {
     setError('');
     setSearching(true);
     try {
-      const result = await dbService.searchUser(cleanNumber);
-      
+      const response = await searchApi.searchUser(cleanNumber);
+      const result = response.data;
+
       if (result.found && result.user) {
         // User found - check if it's a Bhadot
         if (result.role === 'Bhadot' && result.user.id) {
-          // Auto-login and redirect to dashboard
-          navigate(`/bhadot/dashboard/${result.user.id}`);
-          return;
+          setFormData(prev => ({ ...prev, mobile: cleanNumber }));
+          setStep('login');
         } else {
           // User found but wrong role
           setError('This number is registered as a different role. Please use the correct registration page.');
@@ -82,6 +83,22 @@ export default function BhadotRegister() {
       setError('Search failed. Please try again.');
     } finally {
       setSearching(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await bhadotApi.login({ mobile: formData.mobile, password: formData.password });
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
+        navigate(`/bhadot/dashboard/${response.data.bhadot.id}`);
+      }
+    } catch (err: any) {
+      setError('Login failed. Check credentials.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,23 +128,30 @@ export default function BhadotRegister() {
       return;
     }
 
+    if (!formData.password) {
+      setError('Please enter a password');
+      return;
+    }
+
     setLoading(true);
 
     try {
       // Use custom cast if "Other" is selected, otherwise use selected cast
       const finalCast = formData.cast === 'Other' ? formData.customCast.trim() : formData.cast;
-      
+
       // Register new Bhadot with all details
-      const result = await dbService.registerBhadot({
+      const response = await bhadotApi.register({
         name: formData.name,
         mobile: formData.mobile,
         cast: finalCast,
-        totalFamilyMembers: parseInt(formData.totalFamilyMembers)
+        totalFamilyMembers: parseInt(formData.totalFamilyMembers),
+        password: formData.password
       });
-      
+
       // Redirect to dashboard on successful registration
-      if (result.success && result.bhadot) {
-        navigate(`/bhadot/dashboard/${result.bhadot.id}`);
+      if (response.data.success && response.data.bhadot) {
+        localStorage.setItem('token', response.data.token);
+        navigate(`/bhadot/dashboard/${response.data.bhadot.id}`);
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
@@ -146,22 +170,9 @@ export default function BhadotRegister() {
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('roomBhadotRegistration')}</h1>
             <p className="text-gray-600">{t('registerAsTenant')}</p>
-            <div className="mt-4 flex items-center justify-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                step === 'phone' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600'
-              }`}>
-                1
-              </div>
-              <div className="w-12 h-1 bg-gray-200 rounded"></div>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                step === 'details' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
-              }`}>
-                2
-              </div>
-            </div>
           </div>
 
-          {step === 'phone' ? (
+          {step === 'phone' && (
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -218,7 +229,30 @@ export default function BhadotRegister() {
                 {t('backToRoleSelection')}
               </button>
             </div>
-          ) : (
+          )}
+
+          {step === 'login' && (
+            <form onSubmit={handleLogin} className="space-y-6">
+              <h2 className="text-xl font-bold text-center">Login</h2>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input type="password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+              </div>
+              {error && <div className="text-red-500">{error}</div>}
+              <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-xl">
+                {loading ? <LoadingSpinner size="sm" /> : 'Login'}
+              </button>
+              <button type="button" onClick={() => setStep('phone')} className="w-full text-gray-600">Back</button>
+            </form>
+          )}
+
+          {step === 'details' && (
             <div>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
@@ -309,6 +343,11 @@ export default function BhadotRegister() {
                   />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                  <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required />
+                </div>
+
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
                     {error}
@@ -342,13 +381,6 @@ export default function BhadotRegister() {
                   </button>
                 </div>
               </form>
-
-              <button
-                onClick={() => navigate('/')}
-                className="mt-4 w-full text-gray-600 hover:text-gray-900 transition"
-              >
-                {t('backToRoleSelection')}
-              </button>
             </div>
           )}
         </div>
@@ -356,4 +388,3 @@ export default function BhadotRegister() {
     </div>
   );
 }
-

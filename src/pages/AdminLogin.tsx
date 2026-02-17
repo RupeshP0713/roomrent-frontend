@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { dbService } from '../services/dbService';
+import { adminApi } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -18,8 +18,9 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const result = await dbService.adminLogin(id, password);
-      if (result.success) {
+      const response = await adminApi.login({ id, password });
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
         navigate('/admin/dashboard');
       } else {
         setError('Invalid credentials');

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
-import { dbService } from '../services/dbService';
+import { adminApi, malikApi, bhadotApi } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { AdminStats, User, Transaction, Malik, Bhadot, RentRequestWithDetails } from '../types';
 
@@ -17,11 +17,11 @@ export default function AdminDashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'stats' | 'users' | 'transactions'>('stats');
-  
+
   // Pagination states
   const [malikPage, setMalikPage] = useState(1);
   const [bhadotPage, setBhadotPage] = useState(1);
-  
+
   // Edit states
   const [editingMalik, setEditingMalik] = useState<string | null>(null);
   const [editingBhadot, setEditingBhadot] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   const [viewUser, setViewUser] = useState<Malik | Bhadot | null>(null);
   const [viewRequests, setViewRequests] = useState<RentRequestWithDetails[]>([]);
   const [viewLoading, setViewLoading] = useState(false);
-  
+
   // Toast notification state
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
@@ -44,16 +44,19 @@ export default function AdminDashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, usersData, transactionsData] = await Promise.all([
-        dbService.getAdminStats(),
-        dbService.getAllUsers(),
-        dbService.getTransactions(),
+      const [statsRes, usersRes, transactionsRes] = await Promise.all([
+        adminApi.getStats(),
+        adminApi.getUsers(),
+        adminApi.getTransactions(),
       ]);
-      setStats(statsData);
-      setUsers(usersData);
-      setTransactions(transactionsData);
-    } catch (error) {
+      setStats(statsRes.data);
+      setUsers(usersRes.data);
+      setTransactions(transactionsRes.data);
+    } catch (error: any) {
       console.error('Failed to load data:', error);
+      if (error.status === 401 || error.response?.status === 401) {
+        navigate('/admin/login');
+      }
     } finally {
       setLoading(false);
     }
@@ -63,7 +66,7 @@ export default function AdminDashboard() {
     if (!confirm(`Are you sure you want to delete this ${role}?`)) return;
 
     try {
-      await dbService.deleteUser(role, id);
+      await adminApi.deleteUser(role, id);
       await loadData();
       setToast({
         message: `${role} deleted successfully!`,
@@ -98,7 +101,7 @@ export default function AdminDashboard() {
   const handleSaveMalik = async (id: string) => {
     setSaving(true);
     try {
-      await dbService.updateMalik(id, editFormData);
+      await malikApi.update(id, editFormData);
       await loadData();
       setEditingMalik(null);
       setToast({
@@ -118,7 +121,7 @@ export default function AdminDashboard() {
   const handleSaveBhadot = async (id: string) => {
     setSaving(true);
     try {
-      await dbService.updateBhadot(id, editFormData);
+      await bhadotApi.update(id, editFormData);
       await loadData();
       setEditingBhadot(null);
       setToast({
@@ -145,12 +148,12 @@ export default function AdminDashboard() {
     setViewRole('Malik');
     setViewLoading(true);
     try {
-      const [malik, requests] = await Promise.all([
-        dbService.getMalik(id),
-        dbService.getMalikRequests(id),
+      const [malikRes, requestsRes] = await Promise.all([
+        malikApi.getById(id),
+        malikApi.getRequests(id),
       ]);
-      setViewUser(malik);
-      setViewRequests(requests);
+      setViewUser(malikRes.data);
+      setViewRequests(requestsRes.data);
     } catch (error) {
       setToast({
         message: 'Failed to load Malik details',
@@ -168,12 +171,12 @@ export default function AdminDashboard() {
     setViewRole('Bhadot');
     setViewLoading(true);
     try {
-      const [bhadot, requests] = await Promise.all([
-        dbService.getBhadot(id),
-        dbService.getBhadotRequests(id),
+      const [bhadotRes, requestsRes] = await Promise.all([
+        bhadotApi.getById(id),
+        bhadotApi.getRequests(id),
       ]);
-      setViewUser(bhadot);
-      setViewRequests(requests);
+      setViewUser(bhadotRes.data);
+      setViewRequests(requestsRes.data);
     } catch (error) {
       setToast({
         message: 'Failed to load Bhadot details',
@@ -224,38 +227,38 @@ export default function AdminDashboard() {
       <Header
         title="Admin Dashboard"
         showLanguageSwitcher={false}
-        onLogout={() => navigate('/admin/login')}
+        onLogout={() => {
+          localStorage.removeItem('token');
+          navigate('/admin/login')
+        }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs */}
         <div className="bg-white rounded-3xl shadow-lg mb-6 p-2 flex gap-2">
           <button
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition ${
-              activeTab === 'stats'
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition ${activeTab === 'stats'
+              ? 'bg-purple-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             Statistics
           </button>
           <button
             onClick={() => setActiveTab('users')}
-            className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition ${
-              activeTab === 'users'
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition ${activeTab === 'users'
+              ? 'bg-purple-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             Master Database
           </button>
           <button
             onClick={() => setActiveTab('transactions')}
-            className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition ${
-              activeTab === 'transactions'
-                ? 'bg-purple-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`flex-1 py-3 px-4 rounded-2xl font-semibold transition ${activeTab === 'transactions'
+              ? 'bg-purple-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             Transaction Log
           </button>
@@ -533,9 +536,8 @@ export default function AdminDashboard() {
                                 <td className="py-3 px-4 font-medium">{user.name}</td>
                                 <td className="py-3 px-4">{user.mobile}</td>
                                 <td className="py-3 px-4">
-                                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    user.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                  }`}>
+                                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${user.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
                                     {user.status}
                                   </span>
                                 </td>
@@ -636,11 +638,10 @@ export default function AdminDashboard() {
                       <td className="py-3 px-4">{tx.malikName}</td>
                       <td className="py-3 px-4">{tx.bhadotName}</td>
                       <td className="py-3 px-4">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          tx.status === 'Accepted' ? 'bg-green-100 text-green-800' :
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${tx.status === 'Accepted' ? 'bg-green-100 text-green-800' :
                           tx.status === 'Rejected' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
                           {tx.status}
                         </span>
                       </td>
@@ -730,11 +731,10 @@ export default function AdminDashboard() {
                         <div className="space-y-1">
                           <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">STATUS</div>
                           <div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              (viewUser as Bhadot).status === 'Approved' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${(viewUser as Bhadot).status === 'Approved'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                              }`}>
                               {(viewUser as Bhadot).status}
                             </span>
                           </div>
@@ -754,11 +754,10 @@ export default function AdminDashboard() {
                         <div className="space-y-1">
                           <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">ACTIVE</div>
                           <div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              (viewUser as Bhadot).isActive === false
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-green-100 text-green-700'
-                            }`}>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${(viewUser as Bhadot).isActive === false
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-green-100 text-green-700'
+                              }`}>
                               {(viewUser as Bhadot).isActive === false ? 'Inactive' : 'Active'}
                             </span>
                           </div>
@@ -806,15 +805,14 @@ export default function AdminDashboard() {
                                     <td className="py-3 px-4 font-medium text-gray-900">{req.malikName || '-'}</td>
                                   )}
                                   <td className="py-3 px-4">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                      req.status === 'Accepted'
-                                        ? 'bg-green-100 text-green-800'
-                                        : req.status === 'Rejected'
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${req.status === 'Accepted'
+                                      ? 'bg-green-100 text-green-800'
+                                      : req.status === 'Rejected'
                                         ? 'bg-red-100 text-red-800'
                                         : req.status === 'Expired'
-                                        ? 'bg-gray-100 text-gray-700'
-                                        : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
+                                          ? 'bg-gray-100 text-gray-700'
+                                          : 'bg-yellow-100 text-yellow-800'
+                                      }`}>
                                       {req.status}
                                     </span>
                                   </td>
