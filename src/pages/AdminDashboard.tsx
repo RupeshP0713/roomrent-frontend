@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<{ maliks: User[]; bhadots: User[] }>({ maliks: [], bhadots: [] });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'stats' | 'users' | 'transactions'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'users' | 'transactions' | 'messages'>('stats');
 
   // Pagination states
   const [malikPage, setMalikPage] = useState(1);
