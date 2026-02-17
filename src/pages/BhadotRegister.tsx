@@ -25,7 +25,7 @@ export default function BhadotRegister() {
   const { t } = useLanguage();
 
   // Form state management
-  const [step, setStep] = useState<'phone' | 'details' | 'login'>('phone'); // Current step in registration
+  const [step, setStep] = useState<'phone' | 'details'>('phone'); // Current step in registration
   const [mobile, setMobile] = useState(''); // Mobile number input
   const [formData, setFormData] = useState({
     name: '',
@@ -33,7 +33,6 @@ export default function BhadotRegister() {
     cast: '',
     customCast: '', // Custom cast when "Other" is selected
     totalFamilyMembers: '',
-    password: '', // Added password
   });
 
   // UI state management
@@ -64,7 +63,8 @@ export default function BhadotRegister() {
         // User found - check if it's a Bhadot
         if (result.role === 'Bhadot' && result.user.id) {
           setFormData(prev => ({ ...prev, mobile: cleanNumber }));
-          setStep('login');
+          // Auto-login since password is not required
+          await performAutoLogin(cleanNumber);
         } else {
           // User found but wrong role
           setError('This number is registered as a different role. Please use the correct registration page.');
@@ -86,17 +86,16 @@ export default function BhadotRegister() {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const performAutoLogin = async (mobileNumber: string) => {
     setLoading(true);
     try {
-      const response = await bhadotApi.login({ mobile: formData.mobile, password: formData.password });
+      const response = await bhadotApi.login({ mobile: mobileNumber });
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
         navigate(`/bhadot/dashboard/${response.data.bhadot.id}`);
       }
     } catch (err: any) {
-      setError('Login failed. Check credentials.');
+      setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -128,11 +127,6 @@ export default function BhadotRegister() {
       return;
     }
 
-    if (!formData.password) {
-      setError('Please enter a password');
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -144,8 +138,7 @@ export default function BhadotRegister() {
         name: formData.name,
         mobile: formData.mobile,
         cast: finalCast,
-        totalFamilyMembers: parseInt(formData.totalFamilyMembers),
-        password: formData.password
+        totalFamilyMembers: parseInt(formData.totalFamilyMembers)
       });
 
       // Redirect to dashboard on successful registration
@@ -173,7 +166,7 @@ export default function BhadotRegister() {
           </div>
 
           {step === 'phone' && (
-            <div className="space-y-6">
+            <form onSubmit={(e) => { e.preventDefault(); handlePhoneSearch(); }} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('mobileNumber10Digits')}
@@ -208,14 +201,14 @@ export default function BhadotRegister() {
               )}
 
               <button
-                onClick={handlePhoneSearch}
-                disabled={searching || mobile.length !== 10}
+                type="submit"
+                disabled={searching || loading || mobile.length !== 10}
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {searching ? (
+                {searching || loading ? (
                   <>
                     <LoadingSpinner size="sm" />
-                    <span>Searching...</span>
+                    <span>{searching ? 'Searching...' : 'Logging in...'}</span>
                   </>
                 ) : (
                   t('continue')
@@ -223,32 +216,12 @@ export default function BhadotRegister() {
               </button>
 
               <button
+                type="button"
                 onClick={() => navigate('/')}
                 className="w-full text-gray-600 hover:text-gray-900 transition"
               >
                 {t('backToRoleSelection')}
               </button>
-            </div>
-          )}
-
-          {step === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-6">
-              <h2 className="text-xl font-bold text-center">Login</h2>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                <input type="password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={e => setFormData({ ...formData, password: e.target.value })}
-                  required
-                />
-              </div>
-              {error && <div className="text-red-500">{error}</div>}
-              <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-xl">
-                {loading ? <LoadingSpinner size="sm" /> : 'Login'}
-              </button>
-              <button type="button" onClick={() => setStep('phone')} className="w-full text-gray-600">Back</button>
             </form>
           )}
 
@@ -343,10 +316,7 @@ export default function BhadotRegister() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" required />
-                </div>
+
 
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
