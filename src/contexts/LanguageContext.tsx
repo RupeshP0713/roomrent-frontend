@@ -218,7 +218,7 @@ const translations: Record<Language, Record<string, string>> = {
     'registerAsLandlord': 'मकान मालिक के रूप में पंजीकरण करें',
     'whatsappNumber': 'व्हाट्सएप नंबर',
     'whatsappNumber10Digits': 'व्हाट्सएप नंबर (10 अंक)',
-    'checkExistingAccount': 'हम जांचेंगे कि क्या आपका खाता पहले से मौजूद है',
+    'checkExistingAccount': 'हम जांचेंगे कि क्या आपका प्रोफाइल पहले से मौजूद है',
     'continue': 'जारी रखें',
     'searching': 'खोज रहे हैं...',
     'name': 'नाम',
@@ -304,8 +304,8 @@ const translations: Record<Language, Record<string, string>> = {
     'bhadotStatusActive': 'सक्रिय (ON)',
     'bhadotStatusInactive': 'निष्क्रिय (OFF)',
     'bhadotStatusHint': 'मालिक को अपना डेटा दिखाने के लिए इसे ON रखें और मालिक को अपना डेटा नहीं दिखाने के लिए इसे OFF करें।',
-    'accountInactiveWarning': 'आपका खाता निष्क्रिय हो जाएगा',
-    'accountInactiveMessage': 'अनुरोध स्वीकार करने के 5 दिन बाद, आपका खाता स्वचालित रूप से निष्क्रिय हो जाएगा। आप ऊपर दिए गए टॉगल का उपयोग करके इसे कभी भी पुनः सक्रिय कर सकते हैं।',
+    'accountInactiveWarning': 'आपका प्रोफाइल निष्क्रिय हो जाएगा',
+    'accountInactiveMessage': 'अनुरोध स्वीकार करने के 5 दिन बाद, आपका प्रोफाइल स्वचालित रूप से निष्क्रिय हो जाएगा। आप ऊपर दिए गए टॉगल का उपयोग करके इसे कभी भी पुनः सक्रिय कर सकते हैं।',
 
     // Chat Widget
     'supportChat': 'सहायता चैट',
